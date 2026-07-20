@@ -49,6 +49,14 @@ npm start
 
 For production, configure `DATABASE_URL`, `SECRET_KEY`, `FRONTEND_URL`, and `ENVIRONMENT=production` through the hosting platform's secret manager. The backend rejects wildcard CORS and missing critical settings in production.
 
+## Database migrations
+
+The backend now applies versioned Alembic migrations before it starts. New databases initialize automatically. For an existing database, follow the one-time backup and stamping procedure in [`backend/alembic/README.md`](backend/alembic/README.md) before deploying this change.
+
+## Continuous integration
+
+GitHub Actions validates every pull request and change pushed to `main` or a `devops/*` branch. It runs frontend tests and production build, backend tests, a real PostgreSQL migration, both container builds, and Docker Compose configuration validation. The workflow is in [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+
 ## Features
 
 - 3 admin accounts can manage interns, projects, and tasks
