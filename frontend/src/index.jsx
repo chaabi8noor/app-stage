@@ -3,11 +3,20 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { initializeMonitoring, Sentry } from './monitoring';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+initializeMonitoring();
+
+const root = ReactDOM.createRoot(document.getElementById('root'), {
+  onUncaughtError: Sentry.reactErrorHandler(),
+  onCaughtError: Sentry.reactErrorHandler(),
+  onRecoverableError: Sentry.reactErrorHandler(),
+});
 root.render(
   <React.StrictMode>
-    <App />
+    <Sentry.ErrorBoundary fallback={<p>Something went wrong. Please refresh the page.</p>}>
+      <App />
+    </Sentry.ErrorBoundary>
   </React.StrictMode>
 );
 

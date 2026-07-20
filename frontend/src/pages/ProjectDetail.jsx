@@ -1163,7 +1163,7 @@ const MIME_ICONS = { "application/pdf": "📄", "image/png": "🖼", "image/jpeg
 function mimeIcon(mime) { return MIME_ICONS[mime] || "📎"; }
 
 function ResourcesPanel({ projectId, resources, isAdmin, resourceTab, setResourceTab, resForm, setResForm, resFile, setResFile, onAdd, onDelete, onClose }) {
-  const BASE = process.env.REACT_APP_API_URL || "http://localhost:8000";
+  const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
   return (
     <div style={rp.panel}>

@@ -22,6 +22,14 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-internapp}
       SECRET_KEY: ${SECRET_KEY:?Copy .env.example to .env and set SECRET_KEY}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+      METRICS_TOKEN: ${METRICS_TOKEN:-}
+      RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-60}
+      RATE_LIMIT_LOGIN_MAX: ${RATE_LIMIT_LOGIN_MAX:-5}
+      RATE_LIMIT_UPLOAD_MAX: ${RATE_LIMIT_UPLOAD_MAX:-10}
+      RATE_LIMIT_AI_MAX: ${RATE_LIMIT_AI_MAX:-20}
+      TRUST_PROXY_HEADERS: ${TRUST_PROXY_HEADERS:-false}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
       ENVIRONMENT: development
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
@@ -42,7 +50,9 @@ services:
     build:
       context: ./frontend
       args:
-        REACT_APP_API_URL: ${REACT_APP_API_URL:-}
+        VITE_API_URL: ${VITE_API_URL:-}
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
+        VITE_ENVIRONMENT: ${VITE_ENVIRONMENT:-development}
     ports:
       - "3000:80"
     depends_on:

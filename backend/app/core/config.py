@@ -12,6 +12,14 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:3000"
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
+    SENTRY_DSN: str = ""
+    SENTRY_TRACES_SAMPLE_RATE: float = 0.1
+    METRICS_TOKEN: str = ""
+    RATE_LIMIT_WINDOW_SECONDS: int = 60
+    RATE_LIMIT_LOGIN_MAX: int = 5
+    RATE_LIMIT_UPLOAD_MAX: int = 10
+    RATE_LIMIT_AI_MAX: int = 20
+    TRUST_PROXY_HEADERS: bool = False
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
@@ -29,6 +37,8 @@ if settings.is_production:
         raise RuntimeError("DATABASE_URL must be configured in production")
     if not settings.FRONTEND_URL or "*" in settings.FRONTEND_URL:
         raise RuntimeError("FRONTEND_URL must contain explicit production origins")
+    if settings.RATE_LIMIT_WINDOW_SECONDS < 1:
+        raise RuntimeError("RATE_LIMIT_WINDOW_SECONDS must be at least one second")
 
 if not settings.ANTHROPIC_API_KEY:
     warnings.warn("ANTHROPIC_API_KEY is not configured; AI features are unavailable", stacklevel=1)
