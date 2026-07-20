@@ -79,7 +79,7 @@ jobs:
       - run: docker build --tag app-stage-backend:ci ./backend
       - run: docker build --build-arg VITE_API_URL=https://api.example.invalid --tag app-stage-frontend:ci ./frontend
       - name: Scan backend image for critical vulnerabilities
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: app-stage-backend:ci
           format: table
@@ -87,7 +87,7 @@ jobs:
           ignore-unfixed: true
           severity: CRITICAL
       - name: Scan frontend image for critical vulnerabilities
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: app-stage-frontend:ci
           format: table
