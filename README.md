@@ -57,6 +57,10 @@ The backend now applies versioned Alembic migrations before it starts. New datab
 
 GitHub Actions validates every pull request and change pushed to `main` or a `devops/*` branch. It runs frontend tests and production build, backend tests, a real PostgreSQL migration, both container builds, and Docker Compose configuration validation. The workflow is in [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
+## Production deployment
+
+The frontend is configured for Vercel and the API for Railway. Follow the [production deployment runbook](docs/DEPLOYMENT.md) to request access, set the platform variables, deploy safely, and verify or roll back a release.
+
 ## Features
 
 - 3 admin accounts can manage interns, projects, and tasks
