@@ -1,5 +1,5 @@
 // Empty string → relative URLs (Docker/nginx); explicit URL → use it (local dev, Vercel)
-const BASE = process.env.REACT_APP_API_URL ?? "http://localhost:8000";
+const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
 // Cache persistant (sessionStorage) + mémoire — TTL 5 minutes
 const _mem = {};

@@ -40,7 +40,7 @@ npm install
 npm start
 ```
 
-> Set `REACT_APP_API_URL=http://localhost:8000` in `frontend/.env`.
+> Set `VITE_API_URL=http://localhost:8000` in `frontend/.env`.
 
 ## Runtime checks
 
@@ -60,6 +60,10 @@ GitHub Actions validates every pull request and change pushed to `main` or a `de
 ## Production deployment
 
 The frontend is configured for Vercel and the API for Railway. Follow the [production deployment runbook](docs/DEPLOYMENT.md) to request access, set the platform variables, deploy safely, and verify or roll back a release.
+
+## Security and operations
+
+The repository has CI, secret scanning, CodeQL, dependency review, image scans, deployment smoke checks, rate limiting, request logging, metrics, and optional Sentry integration. See the [security policy](SECURITY.md) and [operations runbook](docs/OPERATIONS.md) for the administrator and platform setup that completes the production controls.
 
 ## Features
 

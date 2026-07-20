@@ -23,14 +23,14 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
-      - run: CI=true npm test -- --watchAll=false --passWithNoTests
+      - run: npm test
       - run: npm run build
 
   backend:
@@ -58,8 +58,8 @@ jobs:
       FRONTEND_URL: http://localhost:3000
       SECRET_KEY: ci-only-not-a-production-secret
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -75,14 +75,30 @@ jobs:
     name: Container build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: docker build --tag app-stage-backend:ci ./backend
-      - run: docker build --build-arg REACT_APP_API_URL=https://api.example.invalid --tag app-stage-frontend:ci ./frontend
+      - run: docker build --build-arg VITE_API_URL=https://api.example.invalid --tag app-stage-frontend:ci ./frontend
+      - name: Scan backend image for critical vulnerabilities
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: app-stage-backend:ci
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          severity: CRITICAL
+      - name: Scan frontend image for critical vulnerabilities
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: app-stage-frontend:ci
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          severity: CRITICAL
 
   compose-config:
     name: Compose configuration
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: cp .env.example .env
       - run: docker compose config --quiet

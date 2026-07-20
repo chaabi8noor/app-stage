@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Header, HTTPException, status
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.database import engine
+from app.core.observability import prometheus_metrics
 
 
 router = APIRouter(tags=["operations"])
@@ -27,3 +28,9 @@ def readiness_check():
         ) from exc
 
     return {"status": "ready"}
+
+
+@router.get("/metrics", include_in_schema=False)
+def metrics(authorization: str | None = Header(default=None)):
+    """Return Prometheus metrics; production access requires a bearer token."""
+    return prometheus_metrics(authorization)

@@ -3,6 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from app.core.database import engine, get_db
 from app.core.config import settings
+from app.core.observability import (
+    RateLimitMiddleware,
+    RequestObservabilityMiddleware,
+    SecurityHeadersMiddleware,
+    configure_logging,
+    initialize_sentry,
+)
 from app.routers import auth, users, projects, tasks
 from app.routers.audit import router as audit_router
 from app.routers.notifications import router as notifications_router
@@ -25,6 +32,9 @@ from app.routers.auth import require_admin
 from datetime import datetime
 
 # Schema changes are applied by Alembic before the API process starts.
+
+configure_logging()
+initialize_sentry()
 
 # ── Safe column/table migrations (run on every deploy, idempotent) ────────────
 def run_migrations():
@@ -97,6 +107,16 @@ app = FastAPI(title="Intern Manager API")
 
 _origins = [o.strip() for o in settings.FRONTEND_URL.split(",") if o.strip() and o.strip() != "*"]
 
+app.add_middleware(
+    RateLimitMiddleware,
+    window_seconds=settings.RATE_LIMIT_WINDOW_SECONDS,
+    login_limit=settings.RATE_LIMIT_LOGIN_MAX,
+    upload_limit=settings.RATE_LIMIT_UPLOAD_MAX,
+    ai_limit=settings.RATE_LIMIT_AI_MAX,
+    trust_proxy_headers=settings.TRUST_PROXY_HEADERS,
+)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RequestObservabilityMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_origins if _origins else ["*"],
