@@ -13,7 +13,7 @@ export default function Interns() {
   const [projects, setProjects] = useState([]);
   // Search / filter / pagination
   const [search, setSearch] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all"); // "all" | "active" | "inactive"
+  const [filterStatus] = useState("all"); // "all" | "active" | "inactive"
   const [page, setPage] = useState(1);
   const [filterProject, setFilterProject] = useState("all"); // "all" or project ID
   const [internProjctsMap, setInternProjectsMap] = useState({}); // Map of intern ID to project name
