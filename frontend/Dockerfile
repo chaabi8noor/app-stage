@@ -1,7 +1,7 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 COPY . .
 # Accept REACT_APP_API_URL as empty string so the app uses relative paths
 # routed through nginx to the backend container
