@@ -15,6 +15,7 @@ frontend/.env.production
 # Docker
 *.log
 /tmp/
+/backend/tmp/
 
 # OS
 .DS_Store

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from app.core.database import Base, engine, get_db
+from app.core.database import engine, get_db
 from app.core.config import settings
 from app.routers import auth, users, projects, tasks
 from app.routers.audit import router as audit_router
@@ -24,7 +24,7 @@ from app.models.project import Project
 from app.routers.auth import require_admin
 from datetime import datetime
 
-Base.metadata.create_all(bind=engine)
+# Schema changes are applied by Alembic before the API process starts.
 
 # ── Safe column/table migrations (run on every deploy, idempotent) ────────────
 def run_migrations():
@@ -90,7 +90,8 @@ def run_migrations():
                     print(f"Migration ERREUR: {e}")
                     raise
 
-run_migrations()
+# The legacy function remains as historical reference only. It is deliberately
+# not executed: all new and existing environments use Alembic revisions.
 
 app = FastAPI(title="Intern Manager API")
 
