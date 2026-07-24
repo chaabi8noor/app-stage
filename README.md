@@ -11,7 +11,7 @@ docker-compose up --build
 ```
 
 - Frontend: http://localhost:3000
-- Backend API: http://localhost:8000/docs
+- Backend API documentation: http://localhost:3000/docs (proxied through nginx)
 
 ## Optional local admin seed
 
@@ -30,6 +30,7 @@ The seeded account uses `admin@intern.app`. Never enable this seed process in pr
 ```bash
 cd backend
 pip install -r requirements.txt
+alembic upgrade head
 uvicorn app.main:app --reload
 ```
 

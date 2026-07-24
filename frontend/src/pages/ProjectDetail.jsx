@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { api, clearCache } from "../api/client";
+import { api, clearCache, resolveApiBaseUrl } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import TaskModal from "../components/TaskModal";
 import PartCdcModal from "../components/PartCdcModal";
@@ -222,7 +222,7 @@ setPartForm({
         architecture_notes: archDraft.architecture_notes,
       });
       setProject(p => ({ ...p, ...archDraft }));
-    } catch (err) {
+    } catch {
       alert("Erreur lors de la sauvegarde.");
     } finally {
       setArchSaving(false);
@@ -863,7 +863,7 @@ setPartForm({
           project={project}
           allInterns={allInterns}
           onClose={() => setShowGlobalCdc(false)}
-          onSuccess={(nParts, nTasks, nSubs) => {
+          onSuccess={(nParts, nTasks) => {
             setSuccessMsg(`${nParts} partie${nParts !== 1 ? "s" : ""} et ${nTasks} tâche${nTasks !== 1 ? "s" : ""} créées avec succès !`);
             load();
           }}
@@ -1162,8 +1162,8 @@ const ss = {
 const MIME_ICONS = { "application/pdf": "📄", "image/png": "🖼", "image/jpeg": "🖼", "application/zip": "🗜" };
 function mimeIcon(mime) { return MIME_ICONS[mime] || "📎"; }
 
-function ResourcesPanel({ projectId, resources, isAdmin, resourceTab, setResourceTab, resForm, setResForm, resFile, setResFile, onAdd, onDelete, onClose }) {
-  const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+function ResourcesPanel({ projectId, resources, isAdmin, resourceTab, setResourceTab, resForm, setResForm, setResFile, onAdd, onDelete, onClose }) {
+  const BASE = resolveApiBaseUrl(import.meta.env.VITE_API_URL, import.meta.env.DEV);
 
   return (
     <div style={rp.panel}>

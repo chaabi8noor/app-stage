@@ -19,6 +19,7 @@ jobs:
   frontend:
     name: Frontend checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: frontend
@@ -30,12 +31,14 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
+      - run: npm run lint
       - run: npm test
       - run: npm run build
 
   backend:
     name: Backend and migrations
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     services:
       postgres:
         image: postgres:15
@@ -66,6 +69,7 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -r requirements.txt
+      - run: python -m pip check
       - run: python -m compileall -q app
       - run: python -m unittest discover -s tests -p "test_*.py"
       - run: alembic upgrade head
@@ -74,6 +78,7 @@ jobs:
   container-build:
     name: Container build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
       - run: docker build --tag app-stage-backend:ci ./backend
@@ -98,7 +103,62 @@ jobs:
   compose-config:
     name: Compose configuration
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
       - run: cp .env.example .env
       - run: docker compose config --quiet
+
+  full-stack-smoke:
+    name: Full-stack compose smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [frontend, backend, container-build, compose-config]
+    steps:
+      - uses: actions/checkout@v6
+      - name: Start the complete application
+        run: |
+          cp .env.example .env
+          sed -i \
+            -e 's/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=ci-database-password/' \
+            -e 's/^SECRET_KEY=.*/SECRET_KEY=ci-only-not-for-production/' \
+            -e 's/^SEED_ADMIN=.*/SEED_ADMIN=1/' \
+            -e 's/^SEED_ADMIN_PASSWORD=.*/SEED_ADMIN_PASSWORD=ci-admin-password/' \
+            .env
+          docker compose up --build --detach
+      - name: Verify frontend proxy, API, database migration, and authentication
+        run: |
+          wait_for() {
+            local url="$1"
+            for attempt in {1..30}; do
+              if curl --fail --silent --show-error "$url"; then
+                return 0
+              fi
+              sleep 2
+            done
+            echo "Timed out waiting for $url" >&2
+            return 1
+          }
+
+          wait_for http://localhost:3000/
+          wait_for http://localhost:3000/health
+          wait_for http://localhost:3000/ready
+          wait_for http://localhost:3000/docs
+
+          token="$(curl --fail --silent --show-error \
+            --request POST http://localhost:3000/auth/login \
+            --data-urlencode 'username=admin@intern.app' \
+            --data-urlencode 'password=ci-admin-password' \
+            | python3 -c "import json, sys; print(json.load(sys.stdin)['access_token'])")"
+
+          test -n "$token"
+          curl --fail --silent --show-error \
+            --header "Authorization: Bearer $token" \
+            http://localhost:3000/users/me \
+            | python3 -c "import json, sys; user = json.load(sys.stdin); assert user['email'] == 'admin@intern.app'"
+      - name: Show compose logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop the complete application
+        if: always()
+        run: docker compose down --volumes --remove-orphans

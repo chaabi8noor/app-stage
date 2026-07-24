@@ -81,7 +81,6 @@ export default function Tasks() {
   // Fetch tasks whenever filters or page change
   useEffect(() => {
     fetchTasks(page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterStatus, filterPriority, filterProject, filterIntern, page]);
 
   // Debounce search
@@ -91,7 +90,6 @@ export default function Tasks() {
       fetchTasks(1);
     }, 350);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   // Reset to page 1 when filters change (not search — that's handled above)

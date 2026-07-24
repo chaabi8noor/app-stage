@@ -1,5 +1,11 @@
 // Empty string → relative URLs (Docker/nginx); explicit URL → use it (local dev, Vercel)
-const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+export function resolveApiBaseUrl(apiUrl, isDevelopment) {
+  const configuredUrl = apiUrl?.trim().replace(/\/$/, "");
+  if (configuredUrl) return configuredUrl;
+  return isDevelopment ? "http://localhost:8000" : "";
+}
+
+const BASE = resolveApiBaseUrl(import.meta.env.VITE_API_URL, import.meta.env.DEV);
 
 // Cache persistant (sessionStorage) + mémoire — TTL 5 minutes
 const _mem = {};

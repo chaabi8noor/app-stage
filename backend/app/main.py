@@ -143,10 +143,14 @@ app.include_router(notifications_router)
 app.include_router(resources_router)
 app.include_router(health_router)
 
+def is_enabled(value: str | None) -> bool:
+    return value is not None and value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 @app.on_event("startup")
 def seed_admin():
     import os
-    if not os.getenv("SEED_ADMIN"):
+    if not is_enabled(os.getenv("SEED_ADMIN")):
         return
     db = Session(bind=engine)
     try:
