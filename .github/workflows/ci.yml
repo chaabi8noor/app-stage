@@ -24,7 +24,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
           node-version: 20
@@ -61,7 +61,7 @@ jobs:
       FRONTEND_URL: http://localhost:3000
       SECRET_KEY: ci-only-not-a-production-secret
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: docker build --tag app-stage-backend:ci ./backend
       - run: docker build --build-arg VITE_API_URL=https://api.example.invalid --tag app-stage-frontend:ci ./frontend
       - name: Scan backend image for critical vulnerabilities
@@ -105,7 +105,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: cp .env.example .env
       - run: docker compose config --quiet
 
@@ -115,7 +115,7 @@ jobs:
     timeout-minutes: 15
     needs: [frontend, backend, container-build, compose-config]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Start the complete application
         run: |
           cp .env.example .env
