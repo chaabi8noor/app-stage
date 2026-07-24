@@ -182,7 +182,7 @@ export default function GlobalCdcModal({ project, allInterns, onClose, onSuccess
             </div>
 
             <div style={s.partsList}>
-              {parts.map((part, pi) => (
+              {parts.map(part => (
                 <div key={part._id} style={{ ...s.partCard, ...(part.selected ? {} : s.partUnsel) }}>
                   {/* Part header */}
                   <div style={s.partHeader}>

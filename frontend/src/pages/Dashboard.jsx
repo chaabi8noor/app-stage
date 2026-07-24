@@ -134,9 +134,6 @@ export default function Dashboard() {
   );
 }
 
-const STATUS_FR = { todo: "À faire", in_progress: "En cours", done: "Terminé" };
-const PRIORITY_FR = { low: "Faible", medium: "Moyen", high: "Élevé" };
-
 function StatCard({ label, value, color }) {
   return (
     <div style={{ ...styles.card, borderTop: `4px solid ${color}` }}>
@@ -144,13 +141,6 @@ function StatCard({ label, value, color }) {
       <div style={styles.cardLabel}>{label}</div>
     </div>
   );
-}
-
-function statusColor(s) {
-  return { todo: { background: "#fef3c7", color: "#92400e" }, in_progress: { background: "#dbeafe", color: "#1e40af" }, done: { background: "#d1fae5", color: "#065f46" } }[s] || {};
-}
-function priorityColor(p) {
-  return { low: { background: "#f0fdf4", color: "#15803d" }, medium: { background: "#fffbeb", color: "#b45309" }, high: { background: "#fef2f2", color: "#991b1b" } }[p] || {};
 }
 
 const styles = {

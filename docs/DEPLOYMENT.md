@@ -6,7 +6,7 @@ This repository deploys as two services:
 Browser -> Vercel (React single-page application) -> Railway (FastAPI API + PostgreSQL)
 ```
 
-Vercel serves only the frontend. Railway hosts the API and database migration. Do not put a database connection string or Anthropic key in Vercel: a Create React App variable is included in the browser bundle.
+Vercel serves only the frontend. Railway hosts the API and database migration. Do not put a database connection string or Anthropic key in Vercel: a `VITE_` variable is included in the browser bundle.
 
 ## Access required
 
@@ -32,6 +32,10 @@ The owner uses **Team/Workspace settings -> Members -> Invite**, enters your ema
    SECRET_KEY=<a-new-long-random-secret>
    FRONTEND_URL=https://<vercel-production-domain>
    LOG_LEVEL=INFO
+   METRICS_TOKEN=<long-random-monitoring-token>
+   SENTRY_DSN=<optional-server-side-sentry-dsn>
+   SENTRY_TRACES_SAMPLE_RATE=0.1
+   TRUST_PROXY_HEADERS=true
    SEED_ADMIN=0
    ANTHROPIC_API_KEY=<optional-server-only-key>
    ```
@@ -47,13 +51,15 @@ The owner uses **Team/Workspace settings -> Members -> Invite**, enters your ema
 3. Add the following production environment variable and redeploy:
 
    ```dotenv
-   REACT_APP_API_URL=https://<api-domain>
+   VITE_API_URL=https://<api-domain>
+   VITE_SENTRY_DSN=<optional-public-browser-sentry-dsn>
+   VITE_ENVIRONMENT=production
    ```
 
    The API URL is intentionally public; it is compiled into the frontend. It must never contain credentials. Variable changes affect only new deployments.
 4. Copy the Vercel production URL to Railway's `FRONTEND_URL`, redeploy the API, then verify browser sign-in and an authenticated API request.
 
-For preview deployments, point `REACT_APP_API_URL` at a staging API/database. Do not point every preview at production. The production API permits only explicitly configured CORS origins, so define a deliberate preview-domain policy before connecting previews to it.
+For preview deployments, point `VITE_API_URL` at a staging API/database. Do not point every preview at production. The production API permits only explicitly configured CORS origins, so define a deliberate preview-domain policy before connecting previews to it.
 
 ## Release and recovery checklist
 
@@ -62,6 +68,8 @@ For preview deployments, point `REACT_APP_API_URL` at a staging API/database. Do
 3. Merge to `main`, then check the Railway logs, `/health`, `/ready`, Vercel deployment status, browser console, login, one read action, and one write action.
 4. For a frontend-only regression, promote the prior Vercel deployment. For API rollback, verify the database migration is compatible with the previous application before using Railway rollback.
 5. Rotate any secret exposed in a repository, chat, browser bundle, or deployment log.
+
+See the [operations and reliability runbook](OPERATIONS.md) for branch protection, monitoring, alerts, backup-restore tests, and incident response.
 
 ## Source documentation
 
